@@ -2,11 +2,9 @@ package ChatProject;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -39,9 +37,21 @@ public class ChannelController {
     }
 
     @GetMapping("/channel/findbyname/{channel_name}/messages")
-    public List<Message> listOfMessages(@PathVariable(value="channel_name") String channel_name){
+    public List<Message> listOfMessages(@PathVariable(value="channel_name") String channel_name,
+                                        @RequestParam(value="history", defaultValue = "0") Long history){
+        if(history != 0){
+            List<Message> result = new ArrayList<>();
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            for(Message m : channelRepository.findByName(channel_name).getListOfMessages()){
+                if(LocalDateTime.parse(m.getDateOfCreation(), dtf).isAfter(LocalDateTime.now().minusMinutes(history))){
+                    result.add(m);
+                }
+            }
+            return result;
+        }
         return channelRepository.findByName(channel_name).getListOfMessages();
     }
+
     @PostMapping("/channel/{channel_name}/message")
     public Response addMessage(String channel_name,
                            String account_id,
@@ -53,7 +63,6 @@ public class ChannelController {
                                     channelRepository,
                                     messageRepository);
     }
-
 
     @PatchMapping("/channel/findbyname/{channel_name}")
     public String updateChannelStatus(@PathVariable(value="channel_name") String channel_name, Status status){

@@ -2,12 +2,15 @@ package ChatProject;
 
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,5 +43,19 @@ public class SocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception, IOException{
         ChannelService.addSession(session);
+
+        /*RestTemplate rt = new RestTemplate();
+
+        ResponseEntity<List> re = rt.getForEntity("http://localhost:8080/channel/findbyname/"+ (String) session.getAttributes().get("channel_name") + "/messages?history=60", List.class);
+
+        for(Object m : re.getBody()){
+            session.sendMessage(new TextMessage(((LinkedHashMap)m).toString()));
+        }*/
+
+        for(Message m : new ChannelController(channelRepository, messageRepository).listOfMessages((String)session.getAttributes().get("channel_name"), 60L)){
+            session.sendMessage(new TextMessage("{ \"type\":\"message\", " +
+                                                        "\"account_id\":\""+ m.getAccountId() + "\", " +
+                                                        "\"data\":\"" + m.getContent() + " \"}"));
+        }
     }
 }
