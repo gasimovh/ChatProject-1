@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: 01
+      author: ppolena
+      changes:
+      - createTable:
+          tableName: channel
+          columns:
+          - column:
+              name: channel_id
+              type: varchar2(50)
+              constraints:
+                primaryKey: true
+          - column:
+              name: name
+              type: varchar2(50)
+              constraints:
+                nullable: false
+          - column:
+              name: status
+              type: varchar2(50)
+              constraints:
+                nullable: false
+          - column:
+              name: date_of_creation
+              type: varchar2(50)
+              constraints:
+                nullable: false
+          - column:
+              name: date_of_closing
+              type: varchar2(50)

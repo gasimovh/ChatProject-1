@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 02
+      author: ppolena
+      changes:
+      - createTable:
+          tableName: message
+          columns:
+          - column:
+              name: message_id
+              type: varchar2(50)
+              constraints:
+                primaryKey: true
+          - column:
+              name: date_of_creation
+              type: varchar2(50)
+              constraints:
+                nullable: false
+          - column:
+              name: content
+              type: varchar2(200)
+          - column:
+              name: account_id
+              type: varchar2(50)
+              constraints:
+                nullable: false
+          constraints:
+            foreignKeyName: fk_parent_id
+            references: channel(channel_id)
