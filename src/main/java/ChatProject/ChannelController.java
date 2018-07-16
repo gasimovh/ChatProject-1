@@ -2,6 +2,8 @@ package ChatProject;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -57,7 +59,7 @@ public class ChannelController {
     @PostMapping("/channel/{channel_name}/message")
     public Response addMessage(String channel_name,
                            String account_id,
-                           String content){
+                           String content) throws IOException {
         return channelService
                 .saveAndSendMessage(channel_name,
                                     account_id,

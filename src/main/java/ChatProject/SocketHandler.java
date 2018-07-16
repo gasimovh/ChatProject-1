@@ -19,7 +19,7 @@ public class SocketHandler extends TextWebSocketHandler {
     private final ChannelService channelService;
 
     @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage message){
+    public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException{
 
         Map<String, String> value = new Gson().fromJson(message.getPayload(), Map.class);
 

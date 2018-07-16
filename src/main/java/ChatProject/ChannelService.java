@@ -25,7 +25,7 @@ public class ChannelService {
     public void saveAndSendMessage(WebSocketSession session,
                                    String channelName,
                                    String accountId,
-                                   String content){
+                                   String content) throws IOException{
         if(cr.findByName(channelName).getStatus().equals(Status.Open)){
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime dateOfCreation = LocalDateTime.now();
@@ -34,25 +34,19 @@ public class ChannelService {
             mr.save(message);
 
             for (WebSocketSession webSocketSession : sessions.get(channelName)) {
-                try {
-                    webSocketSession.sendMessage(
-                            new TextMessage(
-                                    "{\"type\":\"message\", " +
-                                            "\"account_id\":\""+ accountId + "\", " +
-                                            "\"data\":\"" + content + " \"}"));
-                }
-                catch(IOException e){}
+                webSocketSession.sendMessage(
+                        new TextMessage(
+                                "{\"type\":\"message\", " +
+                                        "\"account_id\":\""+ accountId + "\", " +
+                                        "\"data\":\"" + content + " \"}"));
             }
         }
         else {
-            try {
-                session.sendMessage(
-                        new TextMessage(
-                                "{\"type\":\"error\", " +
-                                        "\"account_id\":\"" + accountId + "\", " +
-                                        "\"data\":\"ERROR\"}"));
-            }
-            catch (IOException e) {}
+            session.sendMessage(
+                    new TextMessage(
+                            "{\"type\":\"error\", " +
+                                    "\"account_id\":\"" + accountId + "\", " +
+                                    "\"data\":\"Channel is " + cr.findByName(channelName).getStatus() + "!\"}"));
         }
     }
 
@@ -60,26 +54,33 @@ public class ChannelService {
                                        String accountId,
                                        String content,
                                        ChannelRepository cr,
-                                       MessageRepository mr){
-        if(cr.findByName(channelName).getStatus().equals(Status.Open)){
+                                       MessageRepository mr) throws IOException{
+        if((sessions.get(channelName) != null) && (cr.findByName(channelName).getStatus().equals(Status.Open))){
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime dateOfCreation = LocalDateTime.now();
             Message message = new Message(accountId, dtf.format(dateOfCreation), content, cr.findByName(channelName));
             cr.findByName(channelName).addMessage(message);
             mr.save(message);
             for (WebSocketSession webSocketSession : sessions.get(channelName)) {
-                try {
-                    webSocketSession.sendMessage(
-                            new TextMessage(
-                                    "{\"type\":\"message\", " +
-                                            "\"account_id\":\""+ accountId + "\", " +
-                                            "\"data\":\"" + content + " \"}"));
-                }
-                catch(IOException e){}
+                webSocketSession.sendMessage(
+                        new TextMessage(
+                                "{\"type\":\"message\", " +
+                                        "\"account_id\":\""+ accountId + "\", " +
+                                        "\"data\":\"" + content + " \"}"));
             }
             return new Response(Type.Message, accountId, content);
         }
-        return new Response(Type.Error, accountId, "ERROR");
+        else if((sessions.get(channelName) == null) && (cr.findByName(channelName).getStatus().equals(Status.Open))){
+            return new Response(Type.Error, accountId, "No sessions!");
+        }
+        else if((sessions.get(channelName) == null) && !(cr.findByName(channelName).getStatus().equals(Status.Open))){
+            return new Response(Type.Error, accountId, "No sessions and channel " + channelName + " is " +
+                    cr.findByName(channelName).getStatus() + "!");
+        }
+        else {
+            return new Response(Type.Error, accountId,
+                    "Channel is " + cr.findByName(channelName).getStatus() + "!");
+        }
     }
 
     public String addSession(WebSocketSession session){
