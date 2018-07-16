@@ -21,7 +21,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     private final ChannelService cs;
 
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new SocketHandler(cc,cs), "/chat/*")
+        registry.addHandler(new SocketHandler(cc, cs), "/chat/*")
                 .addInterceptors(new HttpSessionHandshakeInterceptor(){
 
                     @Override
@@ -35,8 +35,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
                         attributes.put("channel_name", channelName);
 
-                        boolean b = super.beforeHandshake(request, response, wsHandler, attributes); //&&
-                                //((UsernamePasswordAuthenticationToken) request.getPrincipal()).isAuthenticated();
+                        boolean b = super.beforeHandshake(request, response, wsHandler, attributes);
                         return b;
                     }
 

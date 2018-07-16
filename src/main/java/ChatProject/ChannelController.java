@@ -15,7 +15,6 @@ import java.util.List;
 public class ChannelController {
 
     private final ChannelRepository channelRepository;
-    private final MessageRepository messageRepository;
     private final ChannelService channelService;
 
     @PostMapping("/channel")
@@ -59,13 +58,8 @@ public class ChannelController {
     @PostMapping("/channel/{channel_name}/message")
     public Response addMessage(String channel_name,
                            String account_id,
-                           String content) throws IOException {
-        return channelService
-                .saveAndSendMessage(channel_name,
-                                    account_id,
-                                    content,
-                                    channelRepository,
-                                    messageRepository);
+                           String data) throws IOException {
+        return channelService.saveAndSendMessage(channel_name, account_id, data);
     }
 
     @PatchMapping("/channel/findbyname/{channel_name}")

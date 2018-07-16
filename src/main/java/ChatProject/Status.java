@@ -1,5 +1,5 @@
 package ChatProject;
 
 public enum Status {
-    Draft, Open, Closed
+    DRAFT, OPEN, CLOSED
 }

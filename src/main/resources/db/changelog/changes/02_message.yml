@@ -17,7 +17,7 @@ databaseChangeLog:
               constraints:
                 nullable: false
           - column:
-              name: content
+              name: data
               type: varchar2(200)
           - column:
               name: account_id

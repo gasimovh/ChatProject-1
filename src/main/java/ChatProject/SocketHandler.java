@@ -1,5 +1,6 @@
 package ChatProject;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -21,19 +22,24 @@ public class SocketHandler extends TextWebSocketHandler {
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException{
 
-        Map<String, String> value = new Gson().fromJson(message.getPayload(), Map.class);
+        Map<String, String> json = new Gson().fromJson(message.getPayload(), Map.class);
 
         String channelName = (String) session.getAttributes().get("channel_name");
 
-        channelService.saveAndSendMessage(  session,
-                                            channelName,
-                                            value.get("account_id"),
-                                            value.get("content"));
+        /*String accountID = "";
+
+        if(json.get("type").equals("aut") && !(boolean)session.getAttributes().get("authenticated")){
+            session.getAttributes().put("authenticated", true);
+            //accountID = api > json.get("id");
+        }
+        else {*/
+            channelService.saveAndSendMessage(session, channelName, /*accountID*/ json.get("account_id"), json.get("data"));
+        //}
     }
 
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception, IOException{
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception, IOException {
         channelService.addSession(session);
 
         /*RestTemplate rt = new RestTemplate();
@@ -44,10 +50,13 @@ public class SocketHandler extends TextWebSocketHandler {
             session.sendMessage(new TextMessage(((LinkedHashMap)m).toString()));
         }*/
 
-        for(Message m : channelController.listOfMessages((String)session.getAttributes().get("channel_name"), 60L)){
-            session.sendMessage(new TextMessage("{ \"type\":\"message\", " +
-                                                        "\"account_id\":\""+ m.getAccountId() + "\", " +
-                                                        "\"data\":\"" + m.getContent() + " \"}"));
+        ObjectMapper objectMapper = new ObjectMapper();
+        for (Message m : channelController
+                .listOfMessages((String) session
+                        .getAttributes()
+                        .get("channel_name"), 60L)) {
+            session.sendMessage(new TextMessage(
+                    objectMapper.writeValueAsString(m)));
         }
     }
 }
