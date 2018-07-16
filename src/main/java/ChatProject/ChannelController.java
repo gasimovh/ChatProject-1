@@ -7,12 +7,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @RequiredArgsConstructor
 @RestController
 public class ChannelController {
 
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
+    private final ChannelService channelService;
 
     @PostMapping("/channel")
     public String createChannel(@RequestParam(value="name") String name,
@@ -56,7 +58,7 @@ public class ChannelController {
     public Response addMessage(String channel_name,
                            String account_id,
                            String content){
-        return ChannelService
+        return channelService
                 .saveAndSendMessage(channel_name,
                                     account_id,
                                     content,

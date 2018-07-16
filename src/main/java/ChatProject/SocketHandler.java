@@ -2,27 +2,21 @@ package ChatProject;
 
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 @Component
+@Configurable
 @RequiredArgsConstructor
 public class SocketHandler extends TextWebSocketHandler {
 
-    private final ChannelRepository channelRepository;
-
-    private final MessageRepository messageRepository;
-
-    private Map<String, List<WebSocketSession>> sessions = new HashMap<>();
+    private final ChannelController channelController;
+    private final ChannelService channelService;
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message){
@@ -31,18 +25,16 @@ public class SocketHandler extends TextWebSocketHandler {
 
         String channelName = (String) session.getAttributes().get("channel_name");
 
-        ChannelService.saveAndSendMessage(  session,
+        channelService.saveAndSendMessage(  session,
                                             channelName,
                                             value.get("account_id"),
-                                            value.get("content"),
-                                            channelRepository,
-                                            messageRepository);
+                                            value.get("content"));
     }
 
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception, IOException{
-        ChannelService.addSession(session);
+        channelService.addSession(session);
 
         /*RestTemplate rt = new RestTemplate();
 
@@ -52,7 +44,7 @@ public class SocketHandler extends TextWebSocketHandler {
             session.sendMessage(new TextMessage(((LinkedHashMap)m).toString()));
         }*/
 
-        for(Message m : new ChannelController(channelRepository, messageRepository).listOfMessages((String)session.getAttributes().get("channel_name"), 60L)){
+        for(Message m : channelController.listOfMessages((String)session.getAttributes().get("channel_name"), 60L)){
             session.sendMessage(new TextMessage("{ \"type\":\"message\", " +
                                                         "\"account_id\":\""+ m.getAccountId() + "\", " +
                                                         "\"data\":\"" + m.getContent() + " \"}"));
