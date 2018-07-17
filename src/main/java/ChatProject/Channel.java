@@ -7,7 +7,6 @@ import javax.validation.constraints.NotNull;
 import java.util.LinkedList;
 import java.util.List;
 
-
 @Data
 @Entity
 @Table(name = "channel")
@@ -33,7 +32,11 @@ public class Channel {
     @OneToMany(fetch = FetchType.EAGER, mappedBy="parent", cascade = CascadeType.ALL)
     private List<Message> listOfMessages;
 
-    public Channel(){};
+    public enum Status{
+        DRAFT, OPEN, CLOSED
+    }
+
+    public Channel(){}
 
     public Channel(String name, Status status, String dateOfCreation){
         this.name = name;

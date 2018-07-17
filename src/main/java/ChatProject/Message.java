@@ -44,7 +44,7 @@ public class Message implements Response{
 
     public Message(String accountId, String data, Channel parent){
         this.accountId = accountId;
-        this.type = Type.MESSAGE;
+        this.type = Response.Type.MESSAGE;
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         this.dateOfCreation =  dtf.format(LocalDateTime.now());
         this.data = data;

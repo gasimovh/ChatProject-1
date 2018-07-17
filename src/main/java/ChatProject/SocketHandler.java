@@ -45,11 +45,11 @@ public class SocketHandler extends TextWebSocketHandler {
                 String accountId = responseJson.get("account_id");
                 session.getAttributes().put("account_id", accountId);
                 session.sendMessage(
-                        new TextMessage(new Gson().toJson(new Success("AUTHORIZATION_SUCCESS"))));
+                        new TextMessage(new Gson().toJson(new Success(Response.AuthorizationSuccess))));
             }
             else{
                 session.sendMessage(
-                        new TextMessage(new Gson().toJson(new Error("AUTHORIZATION_FAILED"))));
+                        new TextMessage(new Gson().toJson(new Error(Response.AuthorizationFailed))));
             }
         }
         else {
@@ -62,11 +62,9 @@ public class SocketHandler extends TextWebSocketHandler {
         }
     }
 
-
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception, IOException {
         channelService.addSession(session);
-
         ObjectMapper objectMapper = new ObjectMapper();
         for (Message m : channelController
                 .listOfMessages((String) session

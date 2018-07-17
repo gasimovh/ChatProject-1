@@ -12,7 +12,7 @@ public class Error implements Response{
 
     public Error(String data){
         this.errorId = UUID.randomUUID().toString();
-        this.type = Type.ERROR;
+        this.type = Response.Type.ERROR;
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         this.dateOfCreation =  dtf.format(LocalDateTime.now());
         this.data = data;

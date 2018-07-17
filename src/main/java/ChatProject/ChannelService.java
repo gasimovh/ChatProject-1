@@ -26,7 +26,7 @@ public class ChannelService {
                                    String channelName,
                                    String accountId,
                                    String data) throws IOException{
-        if(cr.findByName(channelName).getStatus().equals(Status.OPEN)){
+        if(cr.findByName(channelName).getStatus().equals(Channel.Status.OPEN)){
             ObjectMapper objectMapper = new ObjectMapper();
             Message message = new Message(accountId, data, cr.findByName(channelName));
             cr.findByName(channelName).addMessage(message);
@@ -40,14 +40,14 @@ public class ChannelService {
         else {
             session.sendMessage(
                     new TextMessage(new Gson()
-                            .toJson(new Error("CHANNEL_" +cr.findByName(channelName).getStatus()))));
+                            .toJson(new Error(Response.ChannelStatus +cr.findByName(channelName).getStatus()))));
         }
     }
 
     public Response saveAndSendMessage(String channelName,
                                        String accountId,
                                        String data) throws IOException{
-        if((sessions.get(channelName) != null) && (cr.findByName(channelName).getStatus().equals(Status.OPEN))){
+        if((sessions.get(channelName) != null) && (cr.findByName(channelName).getStatus().equals(Channel.Status.OPEN))){
             ObjectMapper objectMapper = new ObjectMapper();
             Message message = new Message(accountId, data, cr.findByName(channelName));
             cr.findByName(channelName).addMessage(message);
@@ -58,14 +58,14 @@ public class ChannelService {
             }
             return message;
         }
-        else if((sessions.get(channelName) == null) && (cr.findByName(channelName).getStatus().equals(Status.OPEN))){
-            return new Error("NO_SESSION");
+        else if((sessions.get(channelName) == null) && (cr.findByName(channelName).getStatus().equals(Channel.Status.OPEN))){
+            return new Error(Response.NoSession);
         }
-        else if((sessions.get(channelName) == null) && !(cr.findByName(channelName).getStatus().equals(Status.OPEN))){
-            return new Error("NO_SESSION_CHANNEL_" + cr.findByName(channelName).getStatus());
+        else if((sessions.get(channelName) == null) && !(cr.findByName(channelName).getStatus().equals(Channel.Status.OPEN))){
+            return new Error(Response.NoSessionChannelStatus + cr.findByName(channelName).getStatus());
         }
         else {
-            return new Error("CHANNEL_" + cr.findByName(channelName).getStatus());
+            return new Error(Response.ChannelStatus + cr.findByName(channelName).getStatus());
         }
     }
 

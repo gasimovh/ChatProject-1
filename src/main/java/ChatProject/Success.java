@@ -12,7 +12,7 @@ public class Success implements Response{
 
     public Success(String data){
         this.successId = UUID.randomUUID().toString();
-        this.type = Type.SUCCESS;
+        this.type = Response.Type.SUCCESS;
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         this.dateOfCreation =  dtf.format(LocalDateTime.now());
         this.data = data;

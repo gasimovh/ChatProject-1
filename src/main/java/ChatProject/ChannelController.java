@@ -2,13 +2,11 @@ package ChatProject;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-
 
 @RequiredArgsConstructor
 @RestController
@@ -18,15 +16,15 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @PostMapping("/channel")
-    public String createChannel(@RequestParam(value="name") String name,
-                                @RequestParam(value="status") Status status){
+    public Response createChannel(@RequestParam(value="name") String name,
+                                @RequestParam(value="status") Channel.Status status){
         if(channelRepository.findByName(name) == null){
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime dateOfCreation = LocalDateTime.now();
             channelRepository.save(new Channel(name, status, dtf.format(dateOfCreation)));
-            return "Channel " + name + " created successfully!";
+            return new Success(Response.ChannelCreationSuccess);
         }
-        return "Channel already exists!";
+        return new Error(Response.ChannelCreationFailed);
     }
 
     @GetMapping("/channel")
@@ -63,9 +61,14 @@ public class ChannelController {
     }
 
     @PatchMapping("/channel/findbyname/{channel_name}")
-    public String updateChannelStatus(@PathVariable(value="channel_name") String channel_name, Status status){
+    public Response updateChannelStatus(@PathVariable(value="channel_name") String channel_name,
+                                        Channel.Status status){
         channelRepository.findByName(channel_name).setStatus(status);
+        if(status.equals(Channel.Status.CLOSED)){
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            channelRepository.findByName(channel_name).setDateOfClosing(dtf.format(LocalDateTime.now()));
+        }
         channelRepository.flush();
-        return "Channel status changed to " + status + "!";
+        return new Success(Response.ChannelStatusChanged);
     }
 }
