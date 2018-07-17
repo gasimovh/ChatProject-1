@@ -1,5 +1,5 @@
 package ChatProject;
 
 public enum Type {
-    MESSAGE, ERROR
+    MESSAGE, ERROR, SUCCESS
 }

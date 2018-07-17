@@ -34,6 +34,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
                         String channelName = path.substring(path.lastIndexOf('/') + 1);
 
                         attributes.put("channel_name", channelName);
+                        attributes.put("authenticated", false);
 
                         boolean b = super.beforeHandshake(request, response, wsHandler, attributes);
                         return b;

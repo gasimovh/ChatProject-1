@@ -39,7 +39,7 @@ public class ChannelService {
         }
         else {
             session.sendMessage(
-                    new TextMessage( new Gson()
+                    new TextMessage(new Gson()
                             .toJson(new Error("CHANNEL_" +cr.findByName(channelName).getStatus()))));
         }
     }
